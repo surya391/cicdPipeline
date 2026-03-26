@@ -1,15 +1,33 @@
 stages:
   - install
   - build
+  - deploy
 
 install:
   image: node:20
   stage: install
   script:
     - npm install
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 hour
 
 build:
   image: node:20
   stage: build
   script:
     - npm run build
+  artifacts:
+    paths:
+      - build/ # change to 'dist/' if you use Vite
+    expire_in: 1 hour
+
+deploy:
+  image: node:20
+  stage: deploy
+  script:
+    - npm install -g netlify-cli
+    - netlify deploy --dir=build --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+  only:
+    - main
